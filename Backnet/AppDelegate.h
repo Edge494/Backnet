@@ -8,8 +8,26 @@
 
 #import <Cocoa/Cocoa.h>
 
+
 @interface AppDelegate : NSObject <NSApplicationDelegate>
 
 @property (assign) IBOutlet NSWindow *window;
+- (IBAction)connect:(id)sender; 
+- (IBAction)sync:(id)sender;
+- (IBAction)takeIPFrom:(id)sender;
+- (IBAction)takeAccountFrom:(id)sender;
+- (IBAction)takePasswordFrom:(id)sender;
+- (IBAction)takeBronMapFrom:(id)sender;
+- (IBAction)takeDoelMapFrom:(id)sender;
+
+@property (weak) IBOutlet NSTextField *ipField;
+@property (weak) IBOutlet NSTextField *accountField;
+@property (weak) IBOutlet NSSecureTextField *passwordField;
+@property (weak) IBOutlet NSTextField *bronMapField;
+@property (weak) IBOutlet NSTextField *doelMapField;
+@property (weak) IBOutlet NSTextFieldCell *textView;
+
+
+
 
 @end

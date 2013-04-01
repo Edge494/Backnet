@@ -21,8 +21,31 @@
     
     NSString *ipField = self.ipField.stringValue;               // weergeven van het ip-adres server
     NSString *accountField = self.accountField.stringValue;      // weergeven van de accountnaam
+    NSString *passwordField = self.passwordField.stringValue;   // weergeven van secure password
+    NSString *entireURL = [NSString stringWithFormat:@"afp://%@:%@@%@", accountField, passwordField, ipField];
     
-    NSLog(@"Het ip-adres is %@. De accountnaam is %@.", ipField, accountField); //terugkoppeling van ip-adres en account in de debug weergave
+    NSString *shareField = @"/Users/Edge/Volumes/testdisk";               // Naam ingeven van share
+    
+    NSLog(@"Het ip-adres is %@. De accountnaam is %@. Password is %@", ipField, accountField, passwordField); //terugkoppeling van ip-adres en account in de debug weergave
+    NSLog(@"Adres is afp://%@:%@@%@", accountField, passwordField, ipField); //terugkoppeling van ip-adres en account in de debug weergave
+    
+    NSTask *task;
+    task = [[NSTask alloc] init];
+    [task setLaunchPath:@"/sbin/mount_afp"];     // opstarten van het commando mount_afp via NSTask
+    
+    NSArray *arguments;
+        //Definieren van de argumenten die gebruikt moeten worden voor mount_afp
+    arguments = [NSArray arrayWithObjects: entireURL, shareField, nil];
+    [task setArguments: arguments];
+    
+    NSPipe *pipe;
+    pipe = [NSPipe pipe];
+    [task setStandardOutput: pipe];
+    
+    NSFileHandle *file;
+    file = [pipe fileHandleForReading];
+    
+    [task launch];
     
     
 }
@@ -41,29 +64,47 @@
     
     NSArray *arguments;
             //Definieren van de argumenten die gebruikt moeten worden voor Rsync
-    arguments = [NSArray arrayWithObjects: @"-avu", @"--progress", bronMapField, doelMapField, nil];
+    arguments = [NSArray arrayWithObjects: @"-avun", @"--progress", bronMapField, doelMapField, nil];
     [task setArguments: arguments];
+    
+   // NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+   // [center addObserver:self
+    //           selector:@selector(readPipe:)
+    //               name:@"NSFileHandleReadCompletionNotification"
+    //             object:nil];
     
     NSPipe *pipe;
     pipe = [NSPipe pipe];
-    [task setStandardOutput: pipe];
+    [task setStandardOutput:pipe];
     
-    NSFileHandle *file;
-    file = [pipe fileHandleForReading];
+    NSFileHandle *fileHandle = [pipe fileHandleForReading];
+    [fileHandle readInBackgroundAndNotify];
     
-    [task launch];
+   // -(void)readPipe: (NSNotification *)notification
+   // {
+   //     NSData *data;
+    //    NSString *text;
+   
+   //     if( [notification object] != fileHandle )
+    //        return;
     
-    NSData *data;
-    data = [file readDataToEndOfFile];
-    
-    while ([task isRunning])
-    {
-        NSString *readString;
-        readString = [[NSString alloc] initWithData: data encoding:NSUTF8StringEncoding];
-        [_textView setStringValue:readString];
+   //     data = [[notification userInfo]
+   //             objectForKey:NSFileHandleNotificationDataItem];
+   //     text = [[NSString alloc] initWithData:data
+   //                                  encoding:NSASCIIStringEncoding];
         
-        NSLog(@"grep returned:\n%@", readString);
-    }
+        // Do something with your text
+        // ...
+        
+   //     [text release];
+   //     if( _task )
+   //         [fileHandle readInBackgroundAndNotify];
+   // }
+
+       
+    [task launch];
+     
+    
     
     [task waitUntilExit];
     int status = [task terminationStatus];
@@ -109,6 +150,36 @@
     NSLog(@"%@",doelMapField);
     
     //checken of string input goed doorkomt
+}
+
+- (IBAction)disconnect:(id)sender {
+    NSLog(@"received a disconnect: message");
+    
+    // Check of het klikken van de knop Disconnect goed doorkomt
+    
+    NSString *shareField = @"/Users/Edge/Volumes/testdisk";               // Naam ingeven van share
+        
+    NSLog(@"Disconnect van share %@", shareField); //terugkoppeling van disconnect
+    
+    NSTask *task;
+    task = [[NSTask alloc] init];
+    [task setLaunchPath:@"/sbin/umount"];     // opstarten van het commando mount_afp via NSTask
+    
+    NSArray *arguments;
+    //Definieren van de argumenten die gebruikt moeten worden voor mount_afp
+    arguments = [NSArray arrayWithObjects: shareField, nil];
+    [task setArguments: arguments];
+    
+    NSPipe *pipe;
+    pipe = [NSPipe pipe];
+    [task setStandardOutput: pipe];
+    
+    NSFileHandle *file;
+    file = [pipe fileHandleForReading];
+    
+    [task launch];
+
+    
 }
 
 

@@ -11,6 +11,7 @@
 
 @interface AppDelegate : NSObject <NSApplicationDelegate>
 
+
 @property (assign) IBOutlet NSWindow *window;
 - (IBAction)connect:(id)sender; 
 - (IBAction)sync:(id)sender;
@@ -19,6 +20,7 @@
 - (IBAction)takePasswordFrom:(id)sender;
 - (IBAction)takeBronMapFrom:(id)sender;
 - (IBAction)takeDoelMapFrom:(id)sender;
+- (IBAction)disconnect:(id)sender;
 
 @property (weak) IBOutlet NSTextField *ipField;
 @property (weak) IBOutlet NSTextField *accountField;
@@ -27,7 +29,6 @@
 @property (weak) IBOutlet NSTextField *doelMapField;
 @property (weak) IBOutlet NSTextFieldCell *textView;
 
-
-
+// - (void)readPipe:(NSNotification *)notification;
 
 @end
